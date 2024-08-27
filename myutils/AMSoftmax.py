@@ -99,23 +99,22 @@ class ICCLoss(nn.Module):
         scale = torch.sqrt(torch.tensor(C).float()) * self.m
         label = label.unsqueeze(1) # b 1
         label = label.repeat(1, C) # b c
-        label = label.type(torch.BoolTensor).cuda() # -> bool 1:True(假) 0:False(真)
+        label = label.type(torch.BoolTensor).cuda() 
 
         # res_label = torch.zeros(label.size(), dtype=label.dtype)
         res_label = torch.where(label == 1, 0, 1)
-        res_label = res_label.type(torch.BoolTensor).cuda() # 取反
+        res_label = res_label.type(torch.BoolTensor).cuda() 
 
-        pos_feature = torch.masked_select(feature, res_label) # 取label==0(真)数据特征
-        neg_feature = torch.masked_select(feature, label) # 取label==1(假)数据特征
-        # masked函数会将特征拉成一条向量,需要重塑成[b c]
+        pos_feature = torch.masked_select(feature, res_label) 
+        neg_feature = torch.masked_select(feature, label)
         pos_feature = pos_feature.view(-1, C)
         neg_feature = neg_feature.view(-1, C)
 
-        pos_center = torch.mean(pos_feature, dim=0, keepdim=True) #真实样本特征中心
+        pos_center = torch.mean(pos_feature, dim=0, keepdim=True)
         num_p = pos_feature.size(0)
         num_n = neg_feature.size(0)
         pos_center1 = pos_center.repeat(num_p, 1)
-        pos_center2 = pos_center.repeat(num_n, 1)# 扩充
+        pos_center2 = pos_center.repeat(num_n, 1)
         # dis_pos = nn.functional.cosine_similarity(pos_feature, pos_center1, eps=1e-6)
         # dis_pos = torch.mean(dis_pos, dim=0)
         # dis_neg = nn.functional.cosine_similarity(neg_feature, pos_center2, eps=1e-6)
@@ -160,11 +159,3 @@ class CircleLoss(nn.Module):
 
         loss = self.soft_plus(torch.logsumexp(logit_n, dim=0) + torch.logsumexp(logit_p, dim=0))
         return loss
-
-# if __name__ == '__main__':
-#     criteria = AMSoftmax(1024, 2)
-#     a = torch.randn(4, 1024)
-#     lb = torch.randint(0, 2, (4,), dtype=torch.long)
-#     loss = criteria(a, lb)
-#     print(loss)
-#     loss.backward()

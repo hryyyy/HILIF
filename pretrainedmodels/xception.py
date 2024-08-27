@@ -150,14 +150,15 @@ class SeparableConv2d(nn.Module):
 
     def forward(self, x):
         b, c, _, _ = x.size()
-        y = self.avg_pool(x).view(b, c)  # squeeze操作
+        y = self.avg_pool(x).view(b, c) 
         #print("y.shape={},b={},c={}".format(y.shape,b,c)), #y.shape=torch.Size([40, 128]), b=40, c=128
         y = self.fc(y)
         #print("y2.shape={}".format(y.shape)) y2.shape=torch.Size([40, 128])
         y = y.view(b, c, 1, 1)
         #print("xn.shape={}".format(x.shape)) #xn.shape=torch.Size([40, 128, 55, 55])
         #print("y={}".format(y.shape)) y=torch.Size([40, 128, 55, 55])
-        return x * y.expand_as(x) # 注意力作用每一个通道上"""
+        return x * y.expand_as(x)
+"""
 
 """
 class ChannelAttention(nn.Module):
@@ -234,7 +235,6 @@ class Block(nn.Module):
         # self.se = SE_Block(out_filters)
 
     def forward(self, inp):
-        # 此时x2.shape=torch.Size([40, 64, 109, 109])
         x = self.rep(inp)
 
         if self.skip is not None:
@@ -242,9 +242,6 @@ class Block(nn.Module):
             skip = self.skipbn(skip)
         else:
             skip = inp
-        # print("x1.shape={}".format(x.shape)) #x1.shape=torch.Size([40, 128, 55, 55])
-        # print("skip.shape={}".format(skip.shape)) skip.shape=torch.Size([40, 128, 55, 55])
-        # x = self.se(x)
         x += skip
         return x
 

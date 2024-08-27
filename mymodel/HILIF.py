@@ -24,9 +24,9 @@ def generate_filter(start, end, size):
     return [[0. if i + j > end or i + j < start else 1. for j in range(size)] for i in range(size)]
 
 def generate_filter_gasuss(start, end, size):
-    d0 = end # 代表半径
+    d0 = end
     n = 2
-    template= np.zeros((size,size), dtype=np.float32) #构建滤波器
+    template= np.zeros((size,size), dtype=np.float32)
     r, c = size,size
     for i in np.arange(r):
         for j in np.arange(c):
@@ -35,7 +35,7 @@ def generate_filter_gasuss(start, end, size):
             # else:
             distance = np.sqrt(i ** 2 + j ** 2)
             template[i, j] = 1 / (1 + (distance / d0) ** (2 * n))
-            # template[i, j] = np.e ** (-1 * (distance ** 2 / (2 * d0 ** 2))) #Gaussian滤波函数
+            # template[i, j] = np.e ** (-1 * (distance ** 2 / (2 * d0 ** 2)))
 
     template = 1 - template
     return template
